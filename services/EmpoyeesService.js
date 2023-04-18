@@ -25,8 +25,8 @@ class EmpoyeesService {
     }
 
      //    Получение списка всех найденных данных из бд 
-     async search(query) {
-        const result = await employeesSchema.find(query)
+     async searchById(emplId) {
+        const result = await employeesSchema.findById(emplId)
         if (result == "") {
             return {message : "Не найдено"}
         }

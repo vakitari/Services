@@ -2,68 +2,96 @@ const productServices = require('../services/ProductServices.js')
 
 class ProductController {
 
-    // вызов функции добавленя новой организации пользователей в БД и вывод результата
-    async add(req, res) {
+    async getProduct(req, res, next) {
         try {
-            const result = await productServices.add(req.body)
-            res.status(200).json(result)
+            const product = await productServices.getAll();
+            res.json(new ProductDto(product));
         } catch (e) {
-            res.status(400).json({ message: "Ошибка" })
-            console.log(e);
-        }
-
-
-    }
-    // вызов функции получения списка всех данных организации пользователей и вывод результата
-    async getAll(req, res) {
-        try {
-            return res.json(await productServices.getAll());
-        } catch (e) {
-            console.log(e);
+            next(e);
         }
     }
 
-    // Вызов функции получения списка всех найденных товаров из бд
-    async search(req, res) {
+    async searchById(req, res, next) {
         try {
-            const query = {};
-            query[req.params.param] = req.params.value;
-            const result = await productServices.search(query)
-            res.json(result)
+            const productId = req.params.id || {};
+            const product = await productServices.searchById({ productId });
+            res.json(new ProductDto(product));
         } catch (e) {
-            console.log(e)
+            next(e);
         }
     }
 
-    // вызов функции редактирование организации пользователей и вывод результата
-    async update(req, res) {
+    async getProductAccept(req, res, next) {
         try {
-            if (!req.body._id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await productServices.update(req.body)
-            res.json(result)
-
+            const productId = req.params.id || {};
+            const item = await productServices.getProductPosition({ productId });
+            res.json(new ItemDto(item));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
-
     }
-    // вызов функции удаления организации пользователей из БД и вывод результата
-    async delete(req, res) {
 
+    async getProductUser(req, res, next) {
         try {
-            const { id } = req.params
-            if (!id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await productServices.delete(id)
-
-            res.json(result)
+            const productId = req.params.id || {};
+            const user = await productServices.getProductPosition({ productId });
+            res.json(new UserDto(user));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
+    }
 
+    async getProductProcesItem(req, res, next) {
+        try {
+            const productId = req.params.id || {};
+            const servaccept = await productServices.getProductPosition({ productId });
+            res.json(new UserDto(servaccept));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async addProduct(req, res, next) {
+        try {
+            const productData = req.body || {};
+            const product = await productServices.add(productData);
+            res.json(new ProductDto(product));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async updateProduct(req, res, next) {
+        try {
+            const productId = req.params.id || {};
+            const productData = req.body || {};
+            const product = await productServices.update(productId, productData);
+            res.json(new ProductDto(product));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async deleteProduct(req, res, next) {
+        try {
+            const productId = req.params.id || {};
+            await productServices.delete(productId);
+            res.status(204).send();
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async findProductAndFilter(req, res, next) {
+        try {
+            const param = req.params.value1 || {};
+            const param2 = req.params2.value2 || {};
+            const param3 = req.params3.value3 || {};
+            const product = await productServices.findProductAndFilter(param,param2,param3);
+            res.json(new ProductDto(product));
+        } catch (e) {
+            next(e);
+        }
     }
 }
 module.exports = new ProductController()

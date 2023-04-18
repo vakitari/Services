@@ -2,71 +2,79 @@ const organizationsServices = require('../services/OrganizationsServices.js')
 
 class OrganizationsController {
 
-         // вызов функции добавленя новой организации пользователей в БД и вывод результата
-     async add(req, res) {
+    async getOrganizations(req, res, next) {
         try {
-            const result = await organizationsServices.add(req.body)
-            res.status(200).json(result)
+            const organizations = await organizationsServices.getAll();
+            res.json(new OrganizationsDto(organizations));
         } catch (e) {
-            res.status(400).json({ message: "Ошибка" })
-            console.log(e);
-        }
-
-
-    }
-
-       // вызов функции получения списка всех данных организации пользователей и вывод результата
-    async getAll(req, res) {
-        try {
-            return res.json(await organizationsServices.getAll());
-        } catch (e) {
-            console.log(e);
+            next(e);
         }
     }
 
-    // Вызов функции получения списка всех найденных организаций из бд
-    async search(req, res) {
+    async searchById(req, res, next) {
         try {
-            const query = {};
-            query[req.params.param] = req.params.value;
-            const result = await organizationsServices.search(query)
-            res.json(result)
+            const organizationsId = req.params.id || {};
+            const organizations = await organizationsServices.searchById({ organizationsId });
+            res.json(new OrganizationsDto(organizations));
         } catch (e) {
-            console.log(e)
+            next(e);
         }
     }
 
-       // вызов функции редактирование организации пользователей и вывод результата
-    async update(req, res) {
+    async getOrganizationsUser(req, res, next) {
         try {
-            if (!req.body._id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await organizationsServices.update(req.body)
-            res.json(result)
-
+            const organizationsId = req.params.id || {};
+            const user = await organizationsServices.getOrganizationsUser({ organizationsId });
+            res.json(new UserDto(user));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
-
     }
 
-      // вызов функции удаления организации пользователей из БД и вывод результата
-    async delete(req, res) {
-
+    async addOrganizations(req, res, next) {
         try {
-            const { id } = req.params
-            if (!id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await organizationsServices.delete(id)
-
-            res.json(result)
+            const organizationsData = req.body || {};
+            const organizations = await organizationsServices.add(organizationsData);
+            res.json(new OrganizationstDto(organizations));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
-
     }
+
+    async updateOrganizations(req, res, next) {
+        try {
+            const organizationsId = req.params.id || {};
+            const organizationsData = req.body || {};
+            const organizations = await organizationsServices.update(organizationsId, organizationsData);
+            res.json(new OrganizationstDto(organizations));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async deleteOrganizations(req, res, next) {
+        try {
+            const organizationsId = req.params.id || {};
+            await organizationsServices.delete(organizationsId);
+            res.status(204).send();
+        } catch (e) {
+            next(e);
+        }
+    }
+    
+    async findOrganizationsAndFilter(req, res, next) {
+        try {
+            const param = req.params.value1 || {};
+            const param2 = req.params2.value2 || {};
+            const param3 = req.params3.value3 || {};
+            const organizations = await organizationsServices.findOrganizationsAndFilter(param,param2,param3);
+            res.json(new OrganizationstDto(organizations));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+   
 }
 module.exports = new OrganizationsController()
 

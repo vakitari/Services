@@ -1,71 +1,86 @@
 const acceptanseServicesService = require('../services/AcceptanseServicesServices.js')
+const acceptanceServiceDto = require('../DTO/acceptanceServiceDto.js')
 
 class AcceptanceServiceController {
 
-    // вызов функции Добавления новой услуги в БД и вывод результата
-    async add(req, res) {
+    async getAcceptanceService(req, res, next) {
         try {
-            const result = await acceptanseServicesService.add(req.body)
-            res.status(200).json(result)
+            const acceptanseServices = await acceptanseServicesService.getAll();
+            res.json(new acceptanceServiceDto(acceptanseServices));
         } catch (e) {
-            res.status(400).json({ message: "Ошибка" })
-            console.log(e);
-        }
-
-
-    }
-    // вызов функции получения списка всех услуг и вывод результата
-
-    async getAll(req, res) {
-        try {
-            return res.json(await acceptanseServicesService.getAll());
-        } catch (e) {
-            console.log(e);
+            next(e);
         }
     }
 
-    // Вызов функции получения списка всех найденных товаров из бд
-    async search(req, res) {
+    async searchById(req, res, next) {
         try {
-            const query = {};
-            query[req.params.param] = req.params.value;
-            const result = await acceptanseServicesService.search(query)
-            res.json(result)
+            const acceptanceServiceId = req.params.id || {};
+            const acceptanseServices = await acceptanseServicesService.searchById({ acceptanceServiceId });
+            res.json(new acceptanceServiceDto(acceptanseServices));
         } catch (e) {
-            console.log(e)
+            next(e);
         }
     }
 
-    // вызов функции Редактирования услуги и вывод результата
-    async update(req, res) {
+    async getAcceptanceServiceAccept(req, res, next) {
         try {
-            if (!req.body._id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await acceptanseServicesService.update(req.body)
-            res.json(result)
-
+            const acceptanceServiceId = req.params.id || {};
+            const accept = await acceptanseServicesService.getAcceptanceServicePosition({ acceptanceServiceId });
+            res.json(new ItemDto(accept));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
-
     }
-    // вызов функции удаления услуги из БД и вывод результата
 
-    async delete(req, res) {
-
+    async getAcceptanceServiceTasks(req, res, next) {
         try {
-            const { id } = req.params
-            if (!id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await acceptanseServicesService.delete(id)
-
-            res.json(result)
+            const acceptanceServiceId = req.params.id || {};
+            const tasks = await acceptanseServicesService.getAcceptanceServicePosition({ acceptanceServiceId });
+            res.json(new UserDto(tasks));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
+    }
 
+    async addAcceptanceService(req, res, next) {
+        try {
+            const AcceptanceServiceData = req.body || {};
+            const acceptanseServices = await acceptanseServicesService.add(AcceptanceServiceData);
+            res.json(new acceptanceServiceDto(acceptanseServices));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async updateAcceptanceService(req, res, next) {
+        try {
+            const acceptanceServiceId = req.params.id || {};
+            const AcceptanceServiceData = req.body || {};
+            const acceptanseServices = await acceptanseServicesService.update(acceptanceServiceId, AcceptanceServiceData);
+            res.json(new acceptanceServiceDto(acceptanseServices));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async deleteAcceptanceService(req, res, next) {
+        try {
+            const acceptanceServiceId = req.params.id || {};
+            await acceptanseServicesService.delete(acceptanceServiceId);
+            res.status(204).send();
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async findServacceptAndFilter(req, res, next) {
+        try {
+            const position = req.params.value1 || {};
+            const servaccept = await tasksServices.findtasksAndFilter(position);
+            res.json(new acceptanceServiceDto(servaccept));
+        } catch (e) {
+            next(e);
+        }
     }
 }
 module.exports = new AcceptanceServiceController()

@@ -1,71 +1,84 @@
 const tasksServices = require('../services/TasksService.js')
 
 class TasksController {
-
-    // вызов функции Добавления новой услуги в БД и вывод результата
-    async add(req, res) {
+    async findById(req, res, next) {
         try {
-            const result = await tasksServices.add(req.body)
-            res.status(200).json(result)
+            const search = req.params.id || {};
+            const tasks = await tasksServices.searchById(search);
+            res.json(new EmplDto(tasks));
         } catch (e) {
-            res.status(400).json({ message: "Ошибка" })
-            console.log(e);
-        }
-
-
-    }
-    // вызов функции получения списка всех услуг и вывод результата
-
-    async getAll(req, res) {
-        try {
-            return res.json(await tasksServices.getAll());
-        } catch (e) {
-            console.log(e);
+            next(e);
         }
     }
 
-    // Вызов функции получения списка всех найденных товаров из бд
-    async search(req, res) {
+    async getAll(req, res, next) {
         try {
-            const query = {};
-            query[req.params.param] = req.params.value;
-            const result = await tasksServices.search(query)
-            res.json(result)
+            const tasks = await organizationsServices.getAll();
+            res.json(new OrganizationsDto(tasks));
         } catch (e) {
-            console.log(e)
+            next(e);
         }
     }
 
-    // вызов функции Редактирования услуги и вывод результата
-    async update(req, res) {
+    async addtasks(req, res, next) {
         try {
-            if (!req.body._id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await tasksServices.update(req.body)
-            res.json(result)
-
+            const tasksData = req.body || {};
+            const tasks = await tasksServices.add(tasksData);
+            res.json(new EmplDto(tasks));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
-
     }
-    // вызов функции удаления услуги из БД и вывод результата
 
-    async delete(req, res) {
-
+    async updatetasks(req, res, next) {
         try {
-            const { id } = req.params
-            if (!id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await tasksServices.delete(id)
-
-            res.json(result)
+            const tasksId = req.params.id || {};
+            const tasksData = req.body || {};
+            const tasks = await tasksServices.update(tasksId, tasksData);
+            res.json(new EmplDto(tasks));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
+    }
 
+    async deletetasks(req, res, next) {
+        try {
+            const tasksId = req.params.id || {};
+            await tasksServices.delete(tasksId);
+            res.status(204).send();
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async getOrganizationsEmpl(req, res, next) {
+        try {
+            const tasksId = req.params.id || {};
+            const empl = await organizationsServices.getOrganizationsTasks({ tasksId });
+            res.json(new EmplDto(empl));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async getOrganizationsProcesitem(req, res, next) {
+        try {
+            const tasksId = req.params.id || {};
+            const procesitem = await organizationsServices.getOrganizationsTasks({ tasksId });
+            res.json(new ProcesitemDto(procesitem));
+        } catch (e) {
+            next(e);
+        }
+    }
+    
+    async findtasksAndFilter(req, res, next) {
+        try {
+            const position = req.params.value1 || {};
+            const tasks = await tasksServices.findtasksAndFilter(position);
+            res.json(new EmplDto(tasks));
+        } catch (e) {
+            next(e);
+        }
     }
 }
 module.exports = new TasksController()

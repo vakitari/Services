@@ -2,70 +2,97 @@ const acceptanseServices = require('../services/AcceptanseServices.js')
 
 class AcceptanceController {
 
-    // вызов функции Добавления новой Приёмки в БД и вывод результата
-    async add(req, res) {
+    
+    async getAcceptance(req, res, next) {
         try {
-            const result = await acceptanseServices.add(req.body)
-            res.status(200).json(result)
+            const acceptance = await acceptanseServices.getAll();
+            res.json(new AcceptanceDto(acceptance));
         } catch (e) {
-            res.status(400).json({ message: "Ошибка" })
-            console.log(e);
-        }
-
-
-    }
-    // вызов функции получения списка всех Приёмок и вывод результата
-
-    async getAll(req, res) {
-        try {
-            return res.json(await acceptanseServices.getAll());
-        } catch (e) {
-            console.log(e);
+            next(e);
         }
     }
 
-    // Вызов функции получения списка всех найденных Приёмок из бд
-    async search(req, res) {
+    async searchById(req, res, next) {
         try {
-            const query = {};
-            query[req.params.param] = req.params.value;
-            const result = await acceptanseServices.search(query)
-            res.json(result)
+            const acceptanceId = req.params.id || {};
+            const acceptance = await acceptanseServices.searchById({ acceptanceId });
+            res.json(new AcceptanceDto(acceptance));
         } catch (e) {
-            console.log(e)
+            next(e);
         }
     }
 
-    // вызов функции Редактирования Приёмки и вывод результата
-    async update(req, res) {
+    async getAcceptanceItem(req, res, next) {
         try {
-            if (!req.body._id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await acceptanseServices.update(req.body)
-            res.json(result)
-
+            const acceptanceId = req.params.id || {};
+            const item = await acceptanseServices.getAcceptancePosition({ acceptanceId });
+            res.json(new ItemDto(item));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
-
     }
-    // вызов функции удаления Приёмки из БД и вывод результата
 
-    async delete(req, res) {
-
+    async getAcceptanceUser(req, res, next) {
         try {
-            const { id } = req.params
-            if (!id) {
-                res.status(400).json({ message: "id не указан" })
-            }
-            const result = await acceptanseServices.delete(id)
-
-            res.json(result)
+            const acceptanceId = req.params.id || {};
+            const user = await acceptanseServices.getAcceptancePosition({ acceptanceId });
+            res.json(new UserDto(user));
         } catch (e) {
-            console.log(e);
+            next(e);
         }
+    }
 
+    async getAcceptanceServaccept(req, res, next) {
+        try {
+            const acceptanceId = req.params.id || {};
+            const servaccept = await acceptanseServices.getAcceptancePosition({ acceptanceId });
+            res.json(new UserDto(servaccept));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async addAcceptance(req, res, next) {
+        try {
+            const acceptanceData = req.body || {};
+            const acceptance = await acceptanseServices.add(acceptanceData);
+            res.json(new AcceptanceDto(acceptance));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async updateAcceptance(req, res, next) {
+        try {
+            const acceptanceId = req.params.id || {};
+            const acceptanceData = req.body || {};
+            const acceptance = await acceptanseServices.update(acceptanceId, acceptanceData);
+            res.json(new AcceptanceDto(acceptance));
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async deleteAcceptance(req, res, next) {
+        try {
+            const acceptanceId = req.params.id || {};
+            await acceptanseServices.delete(acceptanceId);
+            res.status(204).send();
+        } catch (e) {
+            next(e);
+        }
+    }
+
+    async findAcceptanceAndFilter(req, res, next) {
+        try {
+            const param = req.params.value1 || {};
+            const param2 = req.params2.value2 || {};
+            const param3 = req.params3.value3 || {};
+            const acceptance = await acceptanseServices.findAcceptanceAndFilter(param,param2,param3);
+            res.json(new AcceptanceDto(acceptance));
+        } catch (e) {
+            next(e);
+        }
     }
 }
 module.exports = new AcceptanceController()
