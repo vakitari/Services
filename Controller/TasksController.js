@@ -13,8 +13,8 @@ class TasksController {
 
     async getAll(req, res, next) {
         try {
-            const tasks = await organizationsServices.getAll();
-            res.json(new OrganizationsDto(tasks));
+            const tasks = await TasksServices.getAll();
+            res.json(new TasksDto(tasks));
         } catch (e) {
             next(e);
         }
@@ -30,7 +30,7 @@ class TasksController {
         }
     }
 
-    async updatetasks(req, res, next) {
+    async updateTasks(req, res, next) {
         try {
             const tasksId = req.params.id || {};
             const tasksData = req.body || {};
@@ -41,7 +41,7 @@ class TasksController {
         }
     }
 
-    async deletetasks(req, res, next) {
+    async deleteTasks(req, res, next) {
         try {
             const tasksId = req.params.id || {};
             await tasksServices.delete(tasksId);
@@ -51,33 +51,34 @@ class TasksController {
         }
     }
 
-    async getOrganizationsEmpl(req, res, next) {
+    async getTasksEmpl(req, res, next) {
         try {
             const tasksId = req.params.id || {};
-            const empl = await organizationsServices.getOrganizationsTasks({ tasksId });
+            const empl = await TasksServices.getTasksTasks({ tasksId });
             res.json(new EmplDto(empl));
         } catch (e) {
             next(e);
         }
     }
 
-    async getOrganizationsProcesitem(req, res, next) {
+    async getTasksProcesitem(req, res, next) {
         try {
             const tasksId = req.params.id || {};
-            const procesitem = await organizationsServices.getOrganizationsTasks({ tasksId });
+            const procesitem = await TasksServices.getTasksTasks({ tasksId });
             res.json(new ProcesitemDto(procesitem));
         } catch (e) {
             next(e);
         }
     }
     
-    async findtasksAndFilter(req, res, next) {
+    async getTasks(req, res) {
         try {
-            const position = req.params.value1 || {};
-            const tasks = await tasksServices.findtasksAndFilter(position);
-            res.json(new EmplDto(tasks));
+            const query = req.query;
+            console.log(query);
+            const result = res.status(200).json(await TasksServices.getTasks(query))
+            res.status(200).json(result)
         } catch (e) {
-            next(e);
+            console.log(e)
         }
     }
 }

@@ -1,5 +1,5 @@
 const acceptanseServicesService = require('../services/AcceptanseServicesServices.js')
-const acceptanceServiceDto = require('../DTO/acceptanceServiceDto.js')
+const acceptanceServiceDto = require('../DTO/AcceptanceServiceDto.js')
 
 class AcceptanceServiceController {
 
@@ -73,13 +73,14 @@ class AcceptanceServiceController {
         }
     }
 
-    async findServacceptAndFilter(req, res, next) {
+    async getAcceptanceService(req, res) {
         try {
-            const position = req.params.value1 || {};
-            const servaccept = await tasksServices.findtasksAndFilter(position);
-            res.json(new acceptanceServiceDto(servaccept));
+            const query = req.query;
+            console.log(query);
+            const result = res.status(200).json(await acceptanseServicesService.getAcceptanceService(query))
+            res.status(200).json(result)
         } catch (e) {
-            next(e);
+            console.log(e)
         }
     }
 }

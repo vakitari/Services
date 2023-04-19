@@ -83,13 +83,14 @@ class EmployeesController {
         }
     }
     
-    async findEmployeesAndFilter(req, res, next) {
+    async getEmpl(req, res) {
         try {
-            const position = req.params.value1 || {};
-            const employees = await employeesServices.findEmployeesAndFilter(position);
-            res.json(new EmplDto(employees));
+            const query = req.query;
+            console.log(query);
+            const result = res.status(200).json(await employeesServices.getEmpl(query))
+            res.status(200).json(result)
         } catch (e) {
-            next(e);
+            console.log(e)
         }
     }
 }

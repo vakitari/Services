@@ -83,15 +83,14 @@ class AcceptanceController {
         }
     }
 
-    async findAcceptanceAndFilter(req, res, next) {
+    async getAcceptance(req, res) {
         try {
-            const param = req.params.value1 || {};
-            const param2 = req.params2.value2 || {};
-            const param3 = req.params3.value3 || {};
-            const acceptance = await acceptanseServices.findAcceptanceAndFilter(param,param2,param3);
-            res.json(new AcceptanceDto(acceptance));
+            const query = req.query;
+            console.log(query);
+            const result = res.status(200).json(await acceptanseServices.getAcceptance(query))
+            res.status(200).json(result)
         } catch (e) {
-            next(e);
+            console.log(e)
         }
     }
 }
